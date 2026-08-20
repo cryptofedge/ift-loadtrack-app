@@ -95,7 +95,7 @@ async function loadUpcoming(userId) {
   if (error) { slot.innerHTML = `<div class="card">Error loading schedule.</div>`; return; }
 
   if (!data || data.length === 0) {
-    slot.innerHTML = `<div class="card">No pending loads assigned.</div>`;
+    slot.innerHTML = `<div class="empty-hint">No pending loads assigned.</div>`;
     return;
   }
 

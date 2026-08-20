@@ -26,7 +26,7 @@ async function loadDocs(userId, profile) {
 
   const { data, error } = await query;
   if (error) { slot.innerHTML = `<div class="card">Error loading documents.</div>`; return; }
-  if (!data || data.length === 0) { slot.innerHTML = `<div class="card">No delivered loads yet.</div>`; return; }
+  if (!data || data.length === 0) { slot.innerHTML = `<div class="empty-hint">No delivered loads yet.</div>`; return; }
 
   slot.innerHTML = data.map(load => `
     <a class="load-item" href="load.html?id=${load.id}">
