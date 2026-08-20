@@ -69,12 +69,48 @@ async function loadHos(userId) {
   const shiftCls = data.shift_minutes_remaining < 30 ? 'hos-crit' : data.shift_minutes_remaining < 120 ? 'hos-warn' : 'hos-ok';
 
   slot.innerHTML = `
-    <div class="hos-strip">
+    <div class="hos-strip" id="hos-strip-tap" role="button">
       <div class="hos-cell"><div class="num ${driveCls}">${fmtMinutes(data.drive_minutes_remaining)}</div><div class="lbl">Drive Left</div></div>
       <div class="hos-cell"><div class="num ${shiftCls}">${fmtMinutes(data.shift_minutes_remaining)}</div><div class="lbl">Shift Left</div></div>
       <div class="hos-cell"><div class="num hos-ok">${data.break_due_at ? new Date(data.break_due_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '—'}</div><div class="lbl">Break Due</div></div>
     </div>
+    <div class="hint-text" style="text-align:center;">Tap for details</div>
   `;
+
+  document.getElementById('hos-strip-tap').addEventListener('click', () => openHosSheet(data));
+}
+
+function openHosSheet(data) {
+  const drivePct = Math.max(0, Math.min(100, (data.drive_minutes_remaining / 660) * 100));
+  const shiftPct = Math.max(0, Math.min(100, (data.shift_minutes_remaining / 840) * 100));
+  const driveRed = data.drive_minutes_remaining < 60;
+  const shiftRed = data.shift_minutes_remaining < 60;
+
+  const guidance = data.break_due_at
+    ? `Take a 30-min break by ${new Date(data.break_due_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} to stay compliant.`
+    : 'No break requirement flagged right now.';
+
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="hos-backdrop" id="hos-backdrop"></div>
+    <div class="hos-sheet" id="hos-sheet">
+      <div class="hos-sheet-handle"></div>
+      <div class="hos-sheet-title">Hours of Service</div>
+      <div class="hos-meter">
+        <div class="hos-meter-lbl"><span>Drive Time Remaining</span><span>${fmtMinutes(data.drive_minutes_remaining)}</span></div>
+        <div class="hos-meter-track"><div class="hos-meter-fill ${driveRed ? 'hos-meter-fill-red' : ''}" style="width:${drivePct}%"></div></div>
+      </div>
+      <div class="hos-meter">
+        <div class="hos-meter-lbl"><span>Shift Time Remaining</span><span>${fmtMinutes(data.shift_minutes_remaining)}</span></div>
+        <div class="hos-meter-track"><div class="hos-meter-fill ${shiftRed ? 'hos-meter-fill-red' : ''}" style="width:${shiftPct}%"></div></div>
+      </div>
+      <div class="hos-guidance">${guidance}</div>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+
+  const close = () => wrap.remove();
+  document.getElementById('hos-backdrop').addEventListener('click', close);
 }
 
 function fmtMinutes(mins) {

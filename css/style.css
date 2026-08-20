@@ -265,6 +265,57 @@ input:focus, select:focus, textarea:focus { outline: 2px solid var(--gold); bord
 .hos-ok { color: var(--green); text-shadow: 0 0 16px rgba(63,166,110,0.5); }
 .hos-warn { color: var(--gold-bright); text-shadow: 0 0 16px rgba(232,200,138,0.5); }
 .hos-crit { color: var(--red); text-shadow: 0 0 16px rgba(214,69,69,0.5); }
+.hos-strip { cursor: pointer; }
+
+.hos-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1500;
+}
+.hos-sheet {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(160deg, #16386A, var(--navy-deep));
+  border-top: 1px solid rgba(193,154,107,0.5);
+  border-radius: 20px 20px 0 0;
+  padding: 12px 22px 28px;
+  z-index: 1501;
+  box-shadow: 0 -20px 60px rgba(0,0,0,0.5);
+}
+.hos-sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.25);
+  margin: 6px auto 16px;
+}
+.hos-sheet-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gold-bright);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+}
+.hos-meter { margin-bottom: 18px; }
+.hos-meter-lbl { display: flex; justify-content: space-between; font-size: 13px; color: var(--off-white); margin-bottom: 6px; }
+.hos-meter-track { height: 10px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; }
+.hos-meter-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #C19A6B, #E8C88A); }
+.hos-meter-fill-red { background: linear-gradient(90deg, #A83232, var(--red)); }
+.hos-guidance {
+  font-size: 14px;
+  color: var(--off-white);
+  background: rgba(193,154,107,0.1);
+  border: 1px solid rgba(193,154,107,0.3);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 6px;
+}
 
 .section-title {
   font-size: 13px;
