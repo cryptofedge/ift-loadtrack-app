@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IFT LoadTrack — Documents</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">IFT LOADTRACK</div>
+    <div class="who" id="who"></div>
+  </div>
+
+  <div class="container">
+    <div class="section-title" style="margin-top:0;">Delivered Loads &amp; Documents</div>
+    <div id="doc-list"><div class="loading">Loading…</div></div>
+  </div>
+
+  <div class="tabbar">
+    <a href="dashboard.html"><span class="icon">&#9679;</span>Dashboard</a>
+    <a href="documents.html" class="active"><span class="icon">&#128193;</span>Documents</a>
+    <a id="dispatch-tab" href="dispatch.html" style="display:none;"><span class="icon">&#128203;</span>Dispatch</a>
+    <a href="#" id="logout-link"><span class="icon">&#9211;</span>Sign Out</a>
+  </div>
+</div>
+
+<script type="module" src="js/documents.js"></script>
+</body>
+</html>

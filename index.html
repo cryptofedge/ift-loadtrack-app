@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IFT LoadTrack — Sign In</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="center-screen">
+  <div class="auth-card">
+    <h1>IFT LoadTrack</h1>
+    <div class="sub">Driver portal — sign in to continue</div>
+
+    <form id="login-form">
+      <label for="login-email">Email</label>
+      <input id="login-email" type="email" required autocomplete="email">
+      <label for="login-password">Password</label>
+      <input id="login-password" type="password" required autocomplete="current-password">
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary btn-lg">SIGN IN</button>
+      </div>
+      <div class="error-text" id="login-error"></div>
+    </form>
+
+    <form id="signup-form" style="display:none;">
+      <label for="signup-name">Full name</label>
+      <input id="signup-name" type="text" required>
+      <label for="signup-truck">Truck ID</label>
+      <input id="signup-truck" type="text" placeholder="e.g. IFT-4471">
+      <label for="signup-email">Email</label>
+      <input id="signup-email" type="email" required autocomplete="email">
+      <label for="signup-password">Password</label>
+      <input id="signup-password" type="password" required minlength="6" autocomplete="new-password">
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary btn-lg">CREATE ACCOUNT</button>
+      </div>
+      <div class="error-text" id="signup-error"></div>
+      <div class="hint-text">New drivers get standard access. Dispatcher/admin access is granted by IFT after signup.</div>
+    </form>
+
+    <div class="link-toggle">
+      <span id="toggle-to-signup">Need an account? <a>Create one</a></span>
+      <span id="toggle-to-login" style="display:none;">Already have an account? <a>Sign in</a></span>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/auth.js"></script>
+</body>
+</html>

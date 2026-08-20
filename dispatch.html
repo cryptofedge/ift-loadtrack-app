@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IFT LoadTrack — Dispatch</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">IFT LOADTRACK</div>
+    <div class="who" id="who"></div>
+  </div>
+
+  <div class="container">
+    <a class="back-link" href="dashboard.html">&larr; Back to Dashboard</a>
+    <div id="gate"><div class="loading">Checking access…</div></div>
+
+    <div id="dispatch-ui" style="display:none;">
+      <div class="section-title" style="margin-top:0;">Create New Load</div>
+      <form id="load-form" class="card">
+        <label for="driver">Assign to Driver</label>
+        <select id="driver" required></select>
+
+        <label for="pickup_name">Pickup Facility</label>
+        <input id="pickup_name" required>
+        <label for="pickup_address">Pickup Address</label>
+        <input id="pickup_address" required>
+        <label for="pickup_window">Pickup Window</label>
+        <input id="pickup_window" placeholder="e.g. Today 2:00–4:00 PM">
+
+        <label for="dropoff_name">Drop-off Facility</label>
+        <input id="dropoff_name" required>
+        <label for="dropoff_address">Drop-off Address</label>
+        <input id="dropoff_address" required>
+
+        <label for="deadline">Delivery Deadline</label>
+        <input id="deadline" type="datetime-local">
+
+        <label for="weight_lbs">Weight (lbs)</label>
+        <input id="weight_lbs" type="number" min="0">
+        <label for="commodity">Commodity</label>
+        <input id="commodity">
+
+        <div class="checkbox-row"><input type="checkbox" id="hazmat"><label for="hazmat">Hazmat</label></div>
+        <div class="checkbox-row"><input type="checkbox" id="temp_controlled"><label for="temp_controlled">Temperature Controlled</label></div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary btn-lg">DISPATCH LOAD</button>
+        </div>
+        <div class="error-text" id="form-error"></div>
+      </form>
+
+      <div class="section-title">Recent Loads</div>
+      <div id="recent-loads"><div class="loading">Loading…</div></div>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <a href="dashboard.html"><span class="icon">&#9679;</span>Dashboard</a>
+    <a href="documents.html"><span class="icon">&#128193;</span>Documents</a>
+    <a href="dispatch.html" class="active"><span class="icon">&#128203;</span>Dispatch</a>
+    <a href="#" id="logout-link"><span class="icon">&#9211;</span>Sign Out</a>
+  </div>
+</div>
+
+<script type="module" src="js/dispatch.js"></script>
+</body>
+</html>

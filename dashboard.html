@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IFT LoadTrack — Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">IFT LOADTRACK</div>
+    <div class="who" id="who">Loading…</div>
+  </div>
+
+  <div class="container">
+    <div class="section-title">Current Load</div>
+    <div id="hero-slot"><div class="loading">Loading…</div></div>
+
+    <div class="section-title">Hours of Service</div>
+    <div id="hos-slot"><div class="loading">Loading…</div></div>
+
+    <div class="section-title">Upcoming Loads</div>
+    <div id="upcoming-slot"><div class="loading">Loading…</div></div>
+  </div>
+
+  <div class="tabbar" id="tabbar">
+    <a href="dashboard.html" class="active"><span class="icon">&#9679;</span>Dashboard</a>
+    <a href="documents.html"><span class="icon">&#128193;</span>Documents</a>
+    <a id="dispatch-tab" href="dispatch.html" style="display:none;"><span class="icon">&#128203;</span>Dispatch</a>
+    <a href="#" id="logout-link"><span class="icon">&#9211;</span>Sign Out</a>
+  </div>
+</div>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
