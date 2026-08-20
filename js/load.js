@@ -30,6 +30,39 @@ async function fetchDocuments() {
   return data || [];
 }
 
+const EVENT_LABELS = {
+  accepted: 'Load Accepted',
+  arrived_pickup: 'Arrived at Pickup',
+  departed_pickup: 'Departed Pickup (Loaded)',
+  arrived_dropoff: 'Arrived at Drop-off',
+  delivered: 'Delivered — POD Captured',
+  closed: 'Load Closed',
+};
+
+async function fetchEvents() {
+  const { data } = await supabase.from('load_events').select('*').eq('load_id', loadId).order('occurred_at');
+  return data || [];
+}
+
+function renderTimeline(events) {
+  if (!events || events.length === 0) return '';
+  const rows = events.map(e => `
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div>
+        <div class="timeline-label">${EVENT_LABELS[e.event_type] || e.event_type}</div>
+        <div class="timeline-time">${new Date(e.occurred_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</div>
+      </div>
+    </div>
+  `).join('');
+  return `
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">Activity History</div>
+      <div class="timeline">${rows}</div>
+    </div>
+  `;
+}
+
 async function logEvent(eventType) {
   await supabase.from('load_events').insert({ load_id: loadId, event_type: eventType });
 }
@@ -152,6 +185,8 @@ async function render(user, profile) {
     actionPanel = `<div class="card" style="border-left-color:var(--steel);">This load is closed.</div>`;
   }
 
+  const events = await fetchEvents();
+
   content.innerHTML = `
     <div class="card">
       ${renderStatusTrack(load.status)}
@@ -160,6 +195,7 @@ async function render(user, profile) {
       ${routeBlock}
     </div>
     ${actionPanel}
+    ${renderTimeline(events)}
   `;
 
   wireActions(load, docs, user);
