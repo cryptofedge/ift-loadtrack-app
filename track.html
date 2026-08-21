@@ -47,6 +47,8 @@
   .sheet-loc-sub { font-size: 13px; color: var(--steel); margin-top: 2px; }
   .sheet-updated { text-align: right; font-size: 12px; color: var(--green); font-weight: 700; }
   .sheet-updated-time { font-size: 11px; color: var(--steel); }
+  #driver-contact-row { flex-direction: row; gap: 10px; }
+  #driver-contact-row .btn { flex: 1; }
   .trip-history-toggle {
     display: flex; justify-content: space-between; align-items: center;
     padding: 14px 0; border-top: 1px solid rgba(255,255,255,0.08);
@@ -86,6 +88,20 @@
         <button class="sheet-close" id="sheet-close" aria-label="Track another shipment">&times;</button>
       </div>
 
+      <div id="driver-section" style="display:none;">
+        <div class="sheet-section-label">Driver</div>
+        <div class="sheet-loc-row">
+          <div>
+            <div class="sheet-loc-main" id="driver-name">—</div>
+            <div class="sheet-loc-sub" id="driver-truck"></div>
+          </div>
+        </div>
+        <div class="btn-row" id="driver-contact-row" style="display:none;">
+          <a id="call-driver-btn" class="btn btn-outline" href="#">&#128222; CALL</a>
+          <a id="text-driver-btn" class="btn btn-outline" href="#">&#128172; TEXT</a>
+        </div>
+      </div>
+
       <div class="sheet-section-label">Location</div>
       <div class="sheet-loc-row">
         <div>
@@ -107,11 +123,16 @@
         <span id="trip-caret">&#8250;</span>
       </div>
       <div id="trip-history-body" style="display:none; padding-bottom:10px;"></div>
+
+      <div id="pod-section" style="display:none;">
+        <div class="sheet-section-label">Proof of Delivery</div>
+        <div id="pod-body" class="hint-text">Loading documents…</div>
+      </div>
     </div>
   </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script type="module" src="js/track.js?v=3"></script>
+<script type="module" src="js/track.js?v=4"></script>
 </body>
 </html>

@@ -86,6 +86,23 @@ async function track(code) {
   document.getElementById('sheet-title').textContent = `${t.pickup_name} → ${t.dropoff_name}`;
   document.getElementById('sheet-sub').textContent = stageLabel(t.status).toUpperCase();
 
+  const driverSection = document.getElementById('driver-section');
+  if (t.driver_name) {
+    driverSection.style.display = 'block';
+    document.getElementById('driver-name').textContent = t.driver_name;
+    document.getElementById('driver-truck').textContent = t.driver_truck_id ? `Truck ${t.driver_truck_id}` : '';
+    const contactRow = document.getElementById('driver-contact-row');
+    if (t.driver_phone) {
+      contactRow.style.display = 'flex';
+      document.getElementById('call-driver-btn').href = `tel:${t.driver_phone}`;
+      document.getElementById('text-driver-btn').href = `sms:${t.driver_phone}`;
+    } else {
+      contactRow.style.display = 'none';
+    }
+  } else {
+    driverSection.style.display = 'none';
+  }
+
   const distance = hasLive && hasDest ? haversineMiles(t.lat, t.lng, t.dropoff_lat, t.dropoff_lng) : null;
   document.getElementById('sheet-distance').textContent = distance != null
     ? `${distance.toFixed(0)} miles remaining`
@@ -113,6 +130,14 @@ async function track(code) {
 
   document.getElementById('trip-history-body').innerHTML = `<div class="card" style="margin-top:8px;">${renderStatusTrack(t.status)}</div>`;
 
+  const podSection = document.getElementById('pod-section');
+  if (['delivered', 'closed'].includes(t.status)) {
+    podSection.style.display = 'block';
+    loadDocuments(code);
+  } else {
+    podSection.style.display = 'none';
+  }
+
   const centerLat = hasLive ? t.lat : (hasDest ? t.dropoff_lat : 39.8283);
   const centerLng = hasLive ? t.lng : (hasDest ? t.dropoff_lng : -98.5795);
   initMap(centerLat, centerLng);
@@ -137,6 +162,25 @@ async function track(code) {
     map.setView(bounds[0], 10);
   }
   setTimeout(() => map.invalidateSize(), 200);
+}
+
+async function loadDocuments(code) {
+  const body = document.getElementById('pod-body');
+  body.textContent = 'Loading documents…';
+
+  const { data, error } = await supabase.functions.invoke('public-documents', { body: { code } });
+
+  if (error || !data || !data.documents || data.documents.length === 0) {
+    body.textContent = 'No documents available yet.';
+    return;
+  }
+
+  const labels = { bol: 'Bill of Lading', signature: 'Signed Proof of Delivery' };
+  body.innerHTML = data.documents.map((d) => `
+    <a href="${d.url}" target="_blank" rel="noopener" class="btn btn-outline" style="margin-bottom:10px;">
+      &#128196; DOWNLOAD ${(labels[d.type] || d.type).toUpperCase()}
+    </a>
+  `).join('');
 }
 
 trackBtn.addEventListener('click', () => {

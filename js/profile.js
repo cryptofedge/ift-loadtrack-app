@@ -12,6 +12,7 @@ if (session) {
 
   document.getElementById('full_name').value = profile.full_name || '';
   document.getElementById('truck_id').value = profile.truck_id || '';
+  document.getElementById('phone').value = profile.phone || '';
   document.getElementById('email').value = user.email;
   document.getElementById('role').value = profile.role === 'dispatcher' ? 'Dispatcher' : 'Driver';
 
@@ -31,6 +32,7 @@ if (session) {
       .update({
         full_name: document.getElementById('full_name').value.trim() || null,
         truck_id: document.getElementById('truck_id').value.trim() || null,
+        phone: document.getElementById('phone').value.trim() || null,
       })
       .eq('id', user.id);
 
