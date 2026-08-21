@@ -51,9 +51,15 @@ function destIcon() {
 function initMap(centerLat, centerLng) {
   if (map) { map.remove(); }
   map = L.map('map', { zoomControl: true }).setView([centerLat, centerLng], 8);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-    maxZoom: 18,
+
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri',
+    maxZoom: 19,
+  }).addTo(map);
+
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    opacity: 0.9,
   }).addTo(map);
 }
 
