@@ -3,8 +3,11 @@ import { stageLabel, renderStatusTrack } from './stages.js';
 
 const input = document.getElementById('code-input');
 const errorEl = document.getElementById('track-error');
-const resultSlot = document.getElementById('result-slot');
 const trackBtn = document.getElementById('track-btn');
+const searchPanel = document.getElementById('search-panel');
+const mapView = document.getElementById('map-view');
+
+let map, truckMarker, destMarker, routeLine;
 
 function haversineMiles(lat1, lng1, lat2, lng2) {
   const R = 3958.8;
@@ -17,15 +20,52 @@ function haversineMiles(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function relativeTime(dateStr) {
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.round(diffMs / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return new Date(dateStr).toLocaleDateString();
+}
+
+function truckIcon() {
+  return L.divIcon({
+    className: '',
+    html: '<div class="truck-pin">&#128666;</div>',
+    iconSize: [38, 38],
+    iconAnchor: [19, 19],
+  });
+}
+
+function destIcon() {
+  return L.divIcon({
+    className: '',
+    html: '<div class="dest-pin"></div>',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+  });
+}
+
+function initMap(centerLat, centerLng) {
+  if (map) { map.remove(); }
+  map = L.map('map', { zoomControl: true }).setView([centerLat, centerLng], 8);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 18,
+  }).addTo(map);
+}
+
 async function track(code) {
   errorEl.textContent = '';
-  resultSlot.innerHTML = `<div class="loading">Looking up shipment…</div>`;
-  trackBtn.textContent = 'TRACK SHIPMENT';
+  trackBtn.textContent = 'LOOKING UP...';
 
   const { data, error } = await supabase.rpc('get_public_tracking', { p_code: code.trim().toLowerCase() });
 
+  trackBtn.textContent = 'TRACK SHIPMENT';
+
   if (error || !data || data.length === 0) {
-    resultSlot.innerHTML = '';
     errorEl.textContent = "We couldn't find a shipment with that tracking code.";
     return;
   }
@@ -33,51 +73,64 @@ async function track(code) {
   const t = data[0];
   const hasLive = t.lat != null && t.lng != null;
   const hasDest = t.dropoff_lat != null && t.dropoff_lng != null;
-  const distance = hasLive && hasDest ? haversineMiles(t.lat, t.lng, t.dropoff_lat, t.dropoff_lng) : null;
 
-  resultSlot.innerHTML = `
-    <div class="card">
-      ${renderStatusTrack(t.status)}
-    </div>
-    <div class="card">
-      <div class="route-diagram">
-        <div class="route-point">
-          <div class="route-dot"></div>
-          <div>
-            <div class="route-label">From</div>
-            <div class="route-name">${t.pickup_name}</div>
-          </div>
-        </div>
-        <div class="route-line" style="margin-left:6px;"></div>
-        <div class="route-point">
-          <div class="route-dot"></div>
-          <div>
-            <div class="route-label">To</div>
-            <div class="route-name">${t.dropoff_name}</div>
-          </div>
-        </div>
-      </div>
-      ${t.deadline ? `
-      <div class="deadline-block">
-        <div class="lbl">Expected By</div>
-        <div class="val">${new Date(t.deadline).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</div>
-      </div>` : ''}
-    </div>
-    ${hasLive ? `
-    <div class="card">
-      <div class="section-title" style="margin-top:0;">Live Location</div>
-      ${distance != null ? `
-      <div class="deadline-block" style="margin-bottom:14px;">
-        <div class="lbl">Approx. Distance Remaining</div>
-        <div class="val">${distance.toFixed(0)} miles (straight-line)</div>
-      </div>` : ''}
-      <div class="btn-row" style="margin-top:0;">
-        <a class="btn btn-outline" href="https://www.google.com/maps?q=${t.lat},${t.lng}" target="_blank" rel="noopener">VIEW ON MAP</a>
-      </div>
-      <div class="hint-text" style="text-align:center;">Last updated ${new Date(t.location_updated_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}</div>
-    </div>
-    ` : `<div class="empty-hint">Live location not available yet for this shipment.</div>`}
-  `;
+  searchPanel.style.display = 'none';
+  mapView.style.display = 'block';
+
+  document.getElementById('sheet-title').textContent = `${t.pickup_name} → ${t.dropoff_name}`;
+  document.getElementById('sheet-sub').textContent = stageLabel(t.status).toUpperCase();
+
+  const distance = hasLive && hasDest ? haversineMiles(t.lat, t.lng, t.dropoff_lat, t.dropoff_lng) : null;
+  document.getElementById('sheet-distance').textContent = distance != null
+    ? `${distance.toFixed(0)} miles remaining`
+    : (hasLive ? 'En route' : 'Awaiting live location');
+  document.getElementById('sheet-route').textContent = `To ${t.dropoff_name}`;
+
+  if (hasLive) {
+    document.getElementById('sheet-updated-badge').innerHTML = '&#9679; LIVE';
+    document.getElementById('sheet-updated-time').textContent = `Updated ${relativeTime(t.location_updated_at)}`;
+  } else {
+    document.getElementById('sheet-updated-badge').innerHTML = '';
+    document.getElementById('sheet-updated-time').textContent = 'No live location yet';
+  }
+
+  const directionsBtn = document.getElementById('directions-btn');
+  if (hasDest) {
+    directionsBtn.href = `https://www.google.com/maps/dir/?api=1&destination=${t.dropoff_lat},${t.dropoff_lng}`;
+    directionsBtn.style.pointerEvents = '';
+    directionsBtn.style.opacity = '';
+  } else {
+    directionsBtn.href = '#';
+    directionsBtn.style.pointerEvents = 'none';
+    directionsBtn.style.opacity = '0.5';
+  }
+
+  document.getElementById('trip-history-body').innerHTML = `<div class="card" style="margin-top:8px;">${renderStatusTrack(t.status)}</div>`;
+
+  const centerLat = hasLive ? t.lat : (hasDest ? t.dropoff_lat : 39.8283);
+  const centerLng = hasLive ? t.lng : (hasDest ? t.dropoff_lng : -98.5795);
+  initMap(centerLat, centerLng);
+
+  const bounds = [];
+  if (hasLive) {
+    truckMarker = L.marker([t.lat, t.lng], { icon: truckIcon() }).addTo(map);
+    bounds.push([t.lat, t.lng]);
+  }
+  if (hasDest) {
+    destMarker = L.marker([t.dropoff_lat, t.dropoff_lng], { icon: destIcon() }).addTo(map);
+    bounds.push([t.dropoff_lat, t.dropoff_lng]);
+  }
+  if (hasLive && hasDest) {
+    routeLine = L.polyline([[t.lat, t.lng], [t.dropoff_lat, t.dropoff_lng]], {
+      color: '#C19A6B', weight: 3, dashArray: '6, 8',
+    }).addTo(map);
+  }
+  if (bounds.length === 2) {
+    map.fitBounds(bounds, { padding: [40, 40] });
+  } else if (bounds.length === 1) {
+    map.setView(bounds[0], 10);
+  }
+  setTimeout(() => map.invalidateSize(), 200);
 }
 
 trackBtn.addEventListener('click', () => {
@@ -88,6 +141,21 @@ trackBtn.addEventListener('click', () => {
 
 input.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') trackBtn.click();
+});
+
+document.getElementById('sheet-close').addEventListener('click', () => {
+  mapView.style.display = 'none';
+  searchPanel.style.display = 'block';
+  input.value = '';
+  errorEl.textContent = '';
+});
+
+document.getElementById('trip-toggle').addEventListener('click', () => {
+  const body = document.getElementById('trip-history-body');
+  const caret = document.getElementById('trip-caret');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  caret.innerHTML = isOpen ? '&#8250;' : '&#8964;';
 });
 
 const params = new URLSearchParams(window.location.search);
