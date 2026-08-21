@@ -58,14 +58,18 @@ html, body {
   align-items: center;
   gap: 8px;
 }
-.topbar .brand::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #E8C88A, #C19A6B);
-  box-shadow: 0 0 10px rgba(232,200,138,0.8);
+.topbar .brand-icon {
+  height: 30px;
+  width: auto;
   flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(232,200,138,0.35));
+}
+
+.auth-logo {
+  display: block;
+  max-width: 220px;
+  width: 60%;
+  margin: 0 auto 18px;
 }
 .topbar .who {
   font-size: 12px;
