@@ -24,6 +24,7 @@ if (session) {
   await loadHero(user.id);
   await loadHos(user.id);
   await loadUpcoming(user.id);
+  await loadAvailable();
   startTracking(user.id);
 }
 
@@ -143,6 +144,32 @@ async function loadUpcoming(userId) {
       <div class="meta">
         <span>${load.pickup_window || 'Pickup window TBD'}</span>
         <span class="pill-badge">Pending Accept</span>
+      </div>
+    </a>
+  `).join('');
+}
+
+async function loadAvailable() {
+  const slot = document.getElementById('available-slot');
+  const { data, error } = await supabase
+    .from('loads')
+    .select('*')
+    .is('driver_id', null)
+    .order('created_at', { ascending: true });
+
+  if (error) { slot.innerHTML = `<div class="card">Error loading open board.</div>`; return; }
+
+  if (!data || data.length === 0) {
+    slot.innerHTML = `<div class="empty-hint">No open loads on the board right now.</div>`;
+    return;
+  }
+
+  slot.innerHTML = data.map(load => `
+    <a class="load-item" href="load.html?id=${load.id}">
+      <div class="route">${load.pickup_name} &rarr; ${load.dropoff_name}</div>
+      <div class="meta">
+        <span>${load.pickup_window || 'Pickup window TBD'}</span>
+        <span class="pill-badge">Open — Tap to Claim</span>
       </div>
     </a>
   `).join('');

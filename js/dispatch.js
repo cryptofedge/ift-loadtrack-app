@@ -29,11 +29,12 @@ if (session) {
 async function populateDrivers() {
   const sel = document.getElementById('driver');
   const { data, error } = await supabase.from('profiles').select('*').eq('role', 'driver').order('full_name');
+  const openOption = `<option value="">— Open Load (any driver can claim) —</option>`;
   if (error || !data || data.length === 0) {
-    sel.innerHTML = `<option value="">No drivers found yet</option>`;
+    sel.innerHTML = openOption;
     return;
   }
-  sel.innerHTML = data.map(d => `<option value="${d.id}">${d.full_name || 'Unnamed'} ${d.truck_id ? '(' + d.truck_id + ')' : ''}</option>`).join('');
+  sel.innerHTML = openOption + data.map(d => `<option value="${d.id}">${d.full_name || 'Unnamed'} ${d.truck_id ? '(' + d.truck_id + ')' : ''}</option>`).join('');
 }
 
 function wireForm() {
@@ -44,21 +45,24 @@ function wireForm() {
 
     const deadlineVal = document.getElementById('deadline').value;
 
+    const dropoffLat = document.getElementById('dropoff_lat').value.trim();
+    const dropoffLng = document.getElementById('dropoff_lng').value.trim();
+
     const payload = {
-      driver_id: document.getElementById('driver').value,
+      driver_id: document.getElementById('driver').value || null,
       pickup_name: document.getElementById('pickup_name').value.trim(),
       pickup_address: document.getElementById('pickup_address').value.trim(),
       pickup_window: document.getElementById('pickup_window').value.trim() || null,
       dropoff_name: document.getElementById('dropoff_name').value.trim(),
       dropoff_address: document.getElementById('dropoff_address').value.trim(),
+      dropoff_lat: dropoffLat ? Number(dropoffLat) : null,
+      dropoff_lng: dropoffLng ? Number(dropoffLng) : null,
       deadline: deadlineVal ? new Date(deadlineVal).toISOString() : null,
       weight_lbs: document.getElementById('weight_lbs').value || null,
       commodity: document.getElementById('commodity').value.trim() || null,
       hazmat: document.getElementById('hazmat').checked,
       temp_controlled: document.getElementById('temp_controlled').checked,
     };
-
-    if (!payload.driver_id) { errorEl.textContent = 'Select a driver.'; return; }
 
     const { error } = await supabase.from('loads').insert(payload);
     if (error) { errorEl.textContent = error.message; return; }
@@ -88,11 +92,12 @@ async function loadRecent() {
   slot.innerHTML = data.map(load => {
     const loc = locationByDriver[load.driver_id];
     const isActive = load.accepted_at && !['delivered', 'closed'].includes(load.status);
+    const trackUrl = `${window.location.origin}${window.location.pathname.replace('dispatch.html', '')}track.html?code=${load.tracking_code}`;
     return `
     <div class="load-item">
       <div class="route">${load.pickup_name} &rarr; ${load.dropoff_name}</div>
       <div class="meta">
-        <span>${load.profiles?.full_name || 'Unassigned'}</span>
+        <span>${load.profiles?.full_name || 'Unassigned (open load)'}</span>
         <span class="pill-badge">${stageLabel(load.status)}${!load.accepted_at ? ' (pending)' : ''}</span>
       </div>
       ${isActive && loc ? `
@@ -100,7 +105,19 @@ async function loadRecent() {
         <a href="https://www.google.com/maps?q=${loc.lat},${loc.lng}" target="_blank" rel="noopener" style="color:var(--gold-bright);">View live location</a>
         <span>Updated ${new Date(loc.updated_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
       </div>` : ''}
+      <div class="meta" style="margin-top:6px;">
+        <button type="button" class="copy-track-btn" data-url="${trackUrl}" style="background:none;border:none;color:var(--gold-bright);font-size:13px;cursor:pointer;padding:0;">Copy customer tracking link</button>
+      </div>
     </div>
   `;
   }).join('');
+
+  slot.querySelectorAll('.copy-track-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(btn.dataset.url);
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    });
+  });
 }

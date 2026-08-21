@@ -116,8 +116,32 @@ async function render(user, profile) {
     </div>` : ''}
   `;
 
-  // Stage 0: not yet accepted -> Accept / Decline
+  // Open load on the board: any driver can claim it
+  if (!load.driver_id) {
+    content.innerHTML = `
+      <div class="card">
+        <div class="section-title" style="margin-top:0;">Open Load — Available to Claim</div>
+        ${routeBlock}
+        <div class="btn-row">
+          <button id="claim-btn" class="btn btn-primary btn-lg">CLAIM THIS LOAD</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('claim-btn').addEventListener('click', async () => {
+      const { error } = await supabase.from('loads').update({ driver_id: user.id, accepted_at: new Date().toISOString() }).eq('id', loadId);
+      if (error) { alert('Could not claim load: ' + error.message); return; }
+      await logEvent('accepted');
+      render(user, profile);
+    });
+    return;
+  }
+
+  // Assigned but not yet accepted -> Accept / Decline (driver only)
   if (!load.accepted_at) {
+    if (load.driver_id !== user.id) {
+      content.innerHTML = `<div class="card">This load is assigned to another driver.</div>`;
+      return;
+    }
     content.innerHTML = `
       <div class="card">
         <div class="section-title" style="margin-top:0;">New Load Assignment</div>

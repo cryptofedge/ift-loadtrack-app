@@ -21,7 +21,8 @@
       <div class="section-title" style="margin-top:0;">Create New Load</div>
       <form id="load-form" class="card">
         <label for="driver">Assign to Driver</label>
-        <select id="driver" required></select>
+        <select id="driver"></select>
+        <div class="hint-text">Leave as "Open Load" to let any driver claim it from their dashboard.</div>
 
         <label for="pickup_name">Pickup Facility</label>
         <input id="pickup_name" required>
@@ -34,6 +35,9 @@
         <input id="dropoff_name" required>
         <label for="dropoff_address">Drop-off Address</label>
         <input id="dropoff_address" required>
+        <label for="dropoff_lat">Drop-off Coordinates (optional, enables distance-remaining on tracking page)</label>
+        <input id="dropoff_lat" type="text" placeholder="Latitude e.g. 40.7484" style="margin-bottom:8px;">
+        <input id="dropoff_lng" type="text" placeholder="Longitude e.g. -73.9857">
 
         <label for="deadline">Delivery Deadline</label>
         <input id="deadline" type="datetime-local">
