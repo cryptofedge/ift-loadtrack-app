@@ -221,10 +221,32 @@ async function render(user, profile) {
       ${routeBlock}
     </div>
     ${actionPanel}
+    ${docs.length > 0 ? `
+    <div class="card">
+      <div class="section-title" style="margin-top:0;">Captured Documents</div>
+      <div class="doc-thumb-row" id="all-docs-thumbs"></div>
+    </div>` : ''}
     ${renderTimeline(events)}
   `;
 
   wireActions(load, docs, user);
+  renderAllDocuments(docs);
+}
+
+function renderAllDocuments(docs) {
+  const row = document.getElementById('all-docs-thumbs');
+  if (!row || docs.length === 0) return;
+  Promise.all(docs.map(async d => {
+    const { data } = await supabase.storage.from('documents').createSignedUrl(d.file_path, 3600);
+    return { url: data?.signedUrl, type: d.doc_type };
+  })).then(items => {
+    row.innerHTML = items.filter(i => i.url).map(i => `
+      <a href="${i.url}" target="_blank" rel="noopener" style="position:relative;">
+        <img class="doc-thumb" src="${i.url}">
+        <span style="position:absolute; bottom:2px; left:2px; right:2px; background:rgba(16,46,92,0.85); color:var(--gold-bright); font-size:9px; text-align:center; border-radius:4px; text-transform:uppercase;">${i.type}</span>
+      </a>
+    `).join('');
+  });
 }
 
 function wireActions(load, docs, user) {
