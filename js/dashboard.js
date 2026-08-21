@@ -1,5 +1,6 @@
 import { supabase, requireSession, getProfile, showConfigWarning } from './supabaseClient.js';
 import { stageLabel } from './stages.js';
+import { startTracking } from './tracker.js';
 
 showConfigWarning();
 
@@ -23,6 +24,7 @@ if (session) {
   await loadHero(user.id);
   await loadHos(user.id);
   await loadUpcoming(user.id);
+  startTracking(user.id);
 }
 
 async function loadHero(userId) {

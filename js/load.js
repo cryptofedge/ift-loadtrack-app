@@ -1,5 +1,6 @@
 import { supabase, requireSession, getProfile, showConfigWarning } from './supabaseClient.js';
 import { renderStatusTrack } from './stages.js';
+import { startTracking } from './tracker.js';
 
 showConfigWarning();
 
@@ -16,6 +17,7 @@ if (!loadId) {
     const profile = await getProfile(user.id);
     document.getElementById('who').textContent = `${profile.full_name || user.email}`;
     await render(user, profile);
+    startTracking(user.id);
   }
 }
 

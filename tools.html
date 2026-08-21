@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IFT LoadTrack — Axle Weight Calculator</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">IFT LOADTRACK</div>
+    <div class="who" id="who"></div>
+  </div>
+
+  <div class="container">
+    <div class="section-title" style="margin-top:0;">Axle Weight Calculator</div>
+    <div class="hint-text" style="margin-bottom:16px;">Enter the scaled weight on each axle group to check against standard federal limits.</div>
+
+    <div class="card">
+      <label for="steer">Steer Axle (lbs)</label>
+      <input id="steer" type="number" min="0" inputmode="numeric" placeholder="e.g. 11800">
+
+      <label for="drive">Drive Tandem (lbs)</label>
+      <input id="drive" type="number" min="0" inputmode="numeric" placeholder="e.g. 33500">
+
+      <label for="trailer">Trailer Tandem (lbs)</label>
+      <input id="trailer" type="number" min="0" inputmode="numeric" placeholder="e.g. 33800">
+
+      <div class="btn-row">
+        <button id="calc-btn" class="btn btn-primary btn-lg">CALCULATE</button>
+      </div>
+    </div>
+
+    <div id="result-slot"></div>
+
+    <div class="hint-text">Standard limits: Steer 12,000 lbs &middot; Each Tandem 34,000 lbs &middot; Gross Vehicle Weight 80,000 lbs. Local/state limits and permits may vary &mdash; always confirm with your carrier's compliance policy.</div>
+  </div>
+
+  <div class="tabbar">
+    <a href="dashboard.html"><span class="icon">&#9679;</span>Dashboard</a>
+    <a href="documents.html"><span class="icon">&#128193;</span>Documents</a>
+    <a href="tools.html" class="active"><span class="icon">&#9878;</span>Tools</a>
+    <a id="dispatch-tab" href="dispatch.html" style="display:none;"><span class="icon">&#128203;</span>Dispatch</a>
+    <a href="#" id="logout-link"><span class="icon">&#9211;</span>Sign Out</a>
+  </div>
+</div>
+
+<script type="module" src="js/tools.js"></script>
+<script type="module" src="js/assistant.js"></script>
+</body>
+</html>

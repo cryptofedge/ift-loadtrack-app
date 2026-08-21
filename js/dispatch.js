@@ -79,13 +79,28 @@ async function loadRecent() {
   if (error) { slot.innerHTML = `<div class="card">Error loading recent loads.</div>`; return; }
   if (!data || data.length === 0) { slot.innerHTML = `<div class="card">No loads dispatched yet.</div>`; return; }
 
-  slot.innerHTML = data.map(load => `
+  const driverIds = [...new Set(data.filter(l => l.driver_id).map(l => l.driver_id))];
+  const { data: locations } = driverIds.length
+    ? await supabase.from('driver_locations').select('*').in('driver_id', driverIds)
+    : { data: [] };
+  const locationByDriver = Object.fromEntries((locations || []).map(l => [l.driver_id, l]));
+
+  slot.innerHTML = data.map(load => {
+    const loc = locationByDriver[load.driver_id];
+    const isActive = load.accepted_at && !['delivered', 'closed'].includes(load.status);
+    return `
     <div class="load-item">
       <div class="route">${load.pickup_name} &rarr; ${load.dropoff_name}</div>
       <div class="meta">
         <span>${load.profiles?.full_name || 'Unassigned'}</span>
         <span class="pill-badge">${stageLabel(load.status)}${!load.accepted_at ? ' (pending)' : ''}</span>
       </div>
+      ${isActive && loc ? `
+      <div class="meta" style="margin-top:6px;">
+        <a href="https://www.google.com/maps?q=${loc.lat},${loc.lng}" target="_blank" rel="noopener" style="color:var(--gold-bright);">View live location</a>
+        <span>Updated ${new Date(loc.updated_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+      </div>` : ''}
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
