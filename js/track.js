@@ -164,7 +164,7 @@ async function track(code) {
   if (bounds.length === 2) {
     map.fitBounds(bounds, { padding: [40, 40] });
   } else if (bounds.length === 1) {
-    map.setView(bounds[0], 10);
+    map.setView(bounds[0], 15);
   }
   setTimeout(() => map.invalidateSize(), 200);
 }
