@@ -52,14 +52,10 @@ function initMap(centerLat, centerLng) {
   if (map) { map.remove(); }
   map = L.map('map', { zoomControl: true }).setView([centerLat, centerLng], 8);
 
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri',
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     maxZoom: 19,
-  }).addTo(map);
-
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19,
-    opacity: 0.9,
+    subdomains: 'abcd',
   }).addTo(map);
 }
 
