@@ -161,8 +161,8 @@ async function track(code) {
       color: '#C19A6B', weight: 3, dashArray: '6, 8',
     }).addTo(map);
   }
-  if (bounds.length === 2) {
-    map.fitBounds(bounds, { padding: [40, 40] });
+  if (hasLive) {
+    map.setView([t.lat, t.lng], 15);
   } else if (bounds.length === 1) {
     map.setView(bounds[0], 15);
   }
